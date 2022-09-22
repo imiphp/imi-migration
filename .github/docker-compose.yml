@@ -15,8 +15,8 @@ services:
       - 3306:3306
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping" ]
-      interval: 10s
-      timeout: 5s
+      interval: 3s
+      timeout: 3s
       retries: 3
       start_period: 5s
   swoole:
