@@ -6,7 +6,7 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_SERVER_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ""
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: "db_imi_migration_test"
       TZ: "Asia/Shanghai"
@@ -24,8 +24,8 @@ services:
     depends_on:
       - mysql
     environment:
-      MYSQL_SERVER_HOST: ${MYSQL_SERVER_HOST}
-      MYSQL_SERVER_PASSWORD: ${MYSQL_SERVER_PASSWORD}
+      MYSQL_SERVER_HOST: mysql
+      MYSQL_SERVER_PASSWORD: ""
     build:
       context: .
       dockerfile: swoole.dockerfile
