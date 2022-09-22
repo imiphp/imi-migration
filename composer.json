@@ -1,0 +1,33 @@
+{
+    "name": "imiphp/imi-migration",
+    "type": "library",
+    "license": "GPL-2.0",
+    "description": "imi 框架数据库迁移组件。imi Migration component.",
+    "require": {
+        "yurunsoft/sql-diff": "dev-master"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "~3.4.0",
+        "phpstan/phpstan": "~1.8.0",
+        "phpunit/phpunit": ">=9",
+        "rector/rector": "^0.12.10",
+        "imiphp/imi": "2.1.x-dev",
+        "swoole/ide-helper": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Imi\\Migration\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "app\\": "example/",
+            "Imi\\Migration\\Test\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "@php vendor/bin/phpunit -c ./phpunit.xml"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,37 @@
+version: "3.4"
+volumes:
+  shared-volume:
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_SERVER_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "db_imi_migration_test"
+      TZ: "Asia/Shanghai"
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+  swoole:
+    container_name: "swoole"
+    depends_on:
+      - mysql
+    environment:
+      MYSQL_SERVER_HOST: ${MYSQL_SERVER_HOST}
+      MYSQL_SERVER_PASSWORD: ${MYSQL_SERVER_PASSWORD}
+    build:
+      context: .
+      dockerfile: swoole.dockerfile
+      args:
+        SWOOLE_DOCKER_VERSION: ${SWOOLE_DOCKER_VERSION}
+    volumes:
+      - "${GITHUB_WORKSPACE}:/imi:rw"
+    working_dir: /imi
+    command: tail -f /dev/null
