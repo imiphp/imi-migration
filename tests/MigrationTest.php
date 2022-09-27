@@ -37,7 +37,7 @@ class MigrationTest extends TestCase
     {
         $sql = <<<SQL
         Query: DROP TABLE `tb_diff1_2`
-        result: OK
+        result: OK, time: %ss
 
         Query: CREATE TABLE `tb_test1` (
           `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -45,19 +45,19 @@ class MigrationTest extends TestCase
           PRIMARY KEY (`id`) USING BTREE,
           KEY `b` (`b`) USING BTREE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC
-        result: OK
+        result: OK, time: %ss
 
         Query: ALTER TABLE `tb_diff1` COMMENT='123' 
-        result: OK
+        result: OK, time: %ss
 
         Query: ALTER TABLE `tb_diff1` DROP COLUMN `drop` 
-        result: OK
+        result: OK, time: %ss
 
         Query: ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` text COLLATE utf8mb4_unicode_ci NOT NULL FIRST
-        result: OK
+        result: OK, time: %ss
 
         Query: ALTER TABLE `tb_diff1` ADD COLUMN `add` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER `index2`
-        result: OK
+        result: OK, time: %ss
 
         Query: ALTER TABLE `tb_diff1` 
         PARTITION BY HASH (`id`)
@@ -67,23 +67,25 @@ class MigrationTest extends TestCase
         PARTITION p2 ENGINE=InnoDB,
         PARTITION p3 ENGINE=InnoDB
         ) 
-        result: OK
+        result: OK, time: %ss
 
         Query: CREATE OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1`  AS SELECT 1 AS `a`, 2 AS `b` 
-        result: OK
+        result: OK, time: %ss
         SQL;
+        $pattern = '/' . preg_quote($sql) . '/';
+        $pattern = str_replace('%s', '.+', $pattern);
 
         $this->initSql();
         ob_start();
         passthru($this->getCmd('migration/patch', [], ['f']), $resultCode);
         $output = ob_get_clean();
-        $this->assertNotFalse(strpos($output, $sql), 'output:' . $output);
+        $this->assertNotFalse((bool) preg_match($pattern, $output), 'output:' . $output);
 
         $this->initSql();
         ob_start();
         passthru($this->getCmd('migration/patch', [], ['f', 'driver' => 'PdoMysqlDriver', 'options' => $this->getOptions()]), $resultCode);
         $output = ob_get_clean();
-        $this->assertNotFalse(strpos($output, $sql), 'output:' . $output);
+        $this->assertNotFalse((bool) preg_match($pattern, $output), 'output:' . $output);
     }
 
     public function testDump(): void

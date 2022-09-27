@@ -38,8 +38,10 @@ class MigrationService
             foreach ($patchSqls as $sql)
             {
                 $output->writeln('<info>Query: </info>' . $sql);
+                $time = microtime(true);
                 $db->exec($sql);
-                $output->writeln('<info>result: </info>OK');
+                $time = microtime(true) - $time;
+                $output->writeln('<info>result: </info>OK, time: ' . round($time, 3) . 's');
                 $output->writeln('');
             }
         }
