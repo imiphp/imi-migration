@@ -35,6 +35,7 @@ class MigrationService
                     return;
                 }
             }
+            $db->exec('SET FOREIGN_KEY_CHECKS=0;');
             foreach ($patchSqls as $sql)
             {
                 $output->writeln('<info>Query: </info>' . $sql);
@@ -44,6 +45,7 @@ class MigrationService
                 $output->writeln('<info>result: </info>OK, time: ' . round($time, 3) . 's');
                 $output->writeln('');
             }
+            $db->exec('SET FOREIGN_KEY_CHECKS=1;');
         }
         else
         {
