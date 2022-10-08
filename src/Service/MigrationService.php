@@ -62,11 +62,11 @@ class MigrationService
         {
             $output = ImiCommand::getOutput();
             $output->writeln('<info>Patch sql:</info>');
-            $output->writeln(implode(';' . \PHP_EOL, $patchSqls) . ';');
+            $output->writeln(implode(';' . \PHP_EOL, $patchSqls) . ($patchSqls ? ';' : ''));
         }
         else
         {
-            File::putContents($file, implode(';' . \PHP_EOL, $patchSqls) . ';');
+            File::putContents($file, implode(';' . \PHP_EOL, $patchSqls) . ($patchSqls ? ';' : ''));
         }
     }
 
