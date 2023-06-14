@@ -18,18 +18,17 @@ class MigrationTest extends TestCase
       PRIMARY KEY (`id`) USING BTREE,
       KEY `b` (`b`) USING BTREE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
-    ALTER TABLE `tb_diff1` COMMENT='123' ;
-    ALTER TABLE `tb_diff1` DROP COLUMN `drop` ;
+    ALTER TABLE `tb_diff1` COMMENT='123';
+    ALTER TABLE `tb_diff1` DROP COLUMN `drop`;
     ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` text COLLATE utf8mb4_unicode_ci NOT NULL FIRST;
     ALTER TABLE `tb_diff1` ADD COLUMN `add` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER `index2`;
-    ALTER TABLE `tb_diff1` 
-    PARTITION BY HASH (`id`)
+    ALTER TABLE `tb_diff1` PARTITION BY HASH (`id`)
     (
     PARTITION p0 ENGINE=InnoDB,
     PARTITION p1 ENGINE=InnoDB,
     PARTITION p2 ENGINE=InnoDB,
     PARTITION p3 ENGINE=InnoDB
-    ) ;
+    );
     CREATE OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1`  AS SELECT 1 AS `a`, 2 AS `b` ;
     SQL;
 
@@ -47,10 +46,10 @@ class MigrationTest extends TestCase
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC
         result: OK, time: %ss
 
-        Query: ALTER TABLE `tb_diff1` COMMENT='123' 
+        Query: ALTER TABLE `tb_diff1` COMMENT='123'
         result: OK, time: %ss
 
-        Query: ALTER TABLE `tb_diff1` DROP COLUMN `drop` 
+        Query: ALTER TABLE `tb_diff1` DROP COLUMN `drop`
         result: OK, time: %ss
 
         Query: ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` text COLLATE utf8mb4_unicode_ci NOT NULL FIRST
@@ -59,14 +58,13 @@ class MigrationTest extends TestCase
         Query: ALTER TABLE `tb_diff1` ADD COLUMN `add` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER `index2`
         result: OK, time: %ss
 
-        Query: ALTER TABLE `tb_diff1` 
-        PARTITION BY HASH (`id`)
+        Query: ALTER TABLE `tb_diff1` PARTITION BY HASH (`id`)
         (
         PARTITION p0 ENGINE=InnoDB,
         PARTITION p1 ENGINE=InnoDB,
         PARTITION p2 ENGINE=InnoDB,
         PARTITION p3 ENGINE=InnoDB
-        ) 
+        )
         result: OK, time: %ss
 
         Query: CREATE OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1`  AS SELECT 1 AS `a`, 2 AS `b` 

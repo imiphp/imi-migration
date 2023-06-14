@@ -30,7 +30,6 @@ return [
                 'password'          => env('MYSQL_SERVER_PASSWORD', 'root'),
                 'database'          => 'db_imi_migration_test',
                 'charset'           => 'utf8mb4',
-                'heartbeatInterval' => 30,
             ],
         ],
     ],
