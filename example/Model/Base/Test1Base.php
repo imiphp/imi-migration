@@ -16,7 +16,7 @@ use Imi\Model\Model as Model;
  *
  * @Entity(camel=true, bean=true, incrUpdate=false)
  * @Table(name=@ConfigValue(name="@app.models.app\Model\Test1.name", default="tb_test1"), usePrefix=false, id={"id"}, dbPoolName=@ConfigValue(name="@app.models.app\Model\Test1.poolName"))
- * @DDL(sql="CREATE TABLE `tb_test1` (   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,   `b` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,   PRIMARY KEY (`id`) USING BTREE,   KEY `b` (`b`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC", decode="")
+ * @DDL(sql="CREATE TABLE `tb_test1` (   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,   `b` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,   PRIMARY KEY (`id`) USING BTREE,   KEY `b` (`b`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC")
  *
  * @property int|null    $id
  * @property string|null $b

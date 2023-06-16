@@ -6,6 +6,7 @@ namespace Imi\Migration\Test;
 
 use function Imi\env;
 use function Imi\ttyExec;
+use Imi\Util\File;
 use PHPUnit\Framework\TestCase;
 
 class MigrationTest extends TestCase
@@ -121,6 +122,131 @@ class MigrationTest extends TestCase
         $this->assertEquals(0, $resultCode);
         $this->assertTrue(is_file($fileName));
         $this->assertEquals(self::SQL_DIFF, file_get_contents($fileName));
+    }
+
+    public function testMigrateGenerate(): void
+    {
+        $this->initSql();
+
+        $path = \dirname(__DIR__) . '/example/.migration';
+        if (is_dir($path))
+        {
+            File::deleteDir($path);
+        }
+        $this->assertFileDoesNotExist($path);
+
+        $generateCommand = \dirname(__DIR__) . '/example/bin/imi-cli generate/model "app\Model" --app-namespace "app" --prefix=tb_ --override=base --lengthCheck --sqlSingleLine';
+        $generateCommandNoMigration = $generateCommand . ' --no-migration';
+        $dataFile = \dirname(__DIR__) . '/example/.migration/data.json';
+
+        $modelPath = \dirname(__DIR__) . '/example/Model';
+        shell_exec('rm -rf ' . \dirname(__DIR__) . '/Model');
+        shell_exec('cp -r -f ' . $modelPath . ' ' . \dirname(__DIR__));
+
+        try
+        {
+            // 生成模型
+            passthru($generateCommand, $resultCode);
+            $this->assertEquals(0, $resultCode);
+            $this->assertTrue(is_file($dataFile));
+            $this->assertNotEquals('[]', $content = file_get_contents($dataFile));
+            $data = json_decode($content, true, \JSON_THROW_ON_ERROR);
+            $version = $data['version'] ?? null;
+            $this->assertIsString($version);
+            $versionPath = $path . '/' . $version;
+
+            // 迁移文件内容校验
+            $content = shell_exec('cat ' . $versionPath . '/down/*_tb_diff1.update.sql');
+            $this->assertEquals(<<<SQL
+            ALTER TABLE `tb_diff1` COMMENT='123';
+            ALTER TABLE `tb_diff1` DROP COLUMN `drop`;
+            ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` text COLLATE utf8mb4_unicode_ci NOT NULL FIRST;
+            ALTER TABLE `tb_diff1` ADD COLUMN `add` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER `index2`;
+            ALTER TABLE `tb_diff1` PARTITION BY HASH (`id`)
+            (
+            PARTITION p0 ENGINE=InnoDB,
+            PARTITION p1 ENGINE=InnoDB,
+            PARTITION p2 ENGINE=InnoDB,
+            PARTITION p3 ENGINE=InnoDB
+            );
+            SQL, $content);
+
+            $content = shell_exec('cat ' . $versionPath . '/down/*_tb_diff1_2.sql');
+            $this->assertEquals(<<<SQL
+            DROP TABLE `tb_diff1_2`;
+            SQL, $content);
+
+            $content = shell_exec('cat ' . $versionPath . '/down/*_v1.create.sql');
+            $this->assertEquals(<<<SQL
+            CREATE OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1`  AS SELECT 1 AS `a`, 2 AS `b` ;
+            SQL, $content);
+
+            $content = shell_exec('cat ' . $versionPath . '/up/*_tb_diff1.update.sql');
+            $this->assertEquals(<<<SQL
+            ALTER TABLE `tb_diff1` DROP COLUMN `add`;
+            ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL AFTER `id`;
+            ALTER TABLE `tb_diff1` ADD COLUMN `drop` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL AFTER `modify`;
+            SQL, $content);
+
+            $content = shell_exec('cat ' . $versionPath . '/up/*_tb_diff1_2.create.sql');
+            $this->assertEquals(<<<SQL
+            CREATE TABLE `tb_diff1_2` (   `modify` text COLLATE utf8mb4_unicode_ci NOT NULL,   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,   `index1` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,   `index2` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,   `add` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   PRIMARY KEY (`id`) USING BTREE,   KEY `index_modify` (`index1`,`index2`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='test diff';
+            SQL, $content);
+
+            $content = shell_exec('cat ' . $versionPath . '/up/*_v1.create.sql');
+            $this->assertEquals(<<<SQL
+            CREATE OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1`  AS SELECT 1 AS `a` ;
+            SQL, $content);
+
+            // 回滚失败
+            ob_start();
+            passthru($this->getCmd('migration/rollback', [], ['f']), $resultCode);
+            $content = ob_get_clean();
+            $this->assertNotEquals(0, $resultCode);
+            $this->assertStringContainsString(sprintf('Current version "%s" is less than or equal to the target version "%s"', $version, $version), $content);
+            // 生成模型
+            passthru($generateCommandNoMigration, $resultCode);
+            $this->assertEquals(0, $resultCode);
+            $this->assertTrue(is_file($dataFile));
+            $this->assertNotEquals('[]', $content = file_get_contents($dataFile));
+            $data2 = json_decode($content, true, \JSON_THROW_ON_ERROR);
+            $tmpVersion = $data2['version'] ?? null;
+            $this->assertEquals($version, $tmpVersion); // 版本无变化
+
+            // 回滚成功
+            passthru($this->getCmd('migration/rollback', ['0'], ['f']), $resultCode);
+            $this->assertEquals(0, $resultCode);
+            shell_exec('rm -f ' . \dirname(__DIR__) . '/example/Model/Diff12.php ' . \dirname(__DIR__) . '/example/Model/Base/Diff12Base.php');
+
+            // 生成模型
+            passthru($generateCommandNoMigration, $resultCode);
+            $this->assertEquals(0, $resultCode);
+            $this->assertTrue(is_file($dataFile));
+            $this->assertNotEquals('[]', $content = file_get_contents($dataFile));
+            $data2 = json_decode($content, true, \JSON_THROW_ON_ERROR);
+            $tmpVersion = $data2['version'] ?? null;
+            $this->assertEquals('0', $tmpVersion);
+
+            // 迁移
+            passthru($this->getCmd('migration/migrate', [$version], ['f']), $resultCode);
+            $this->assertEquals(0, $resultCode);
+            // 生成模型
+            passthru($generateCommandNoMigration, $resultCode);
+            $this->assertEquals(0, $resultCode);
+            $this->assertTrue(is_file($dataFile));
+            $this->assertNotEquals('[]', $content = file_get_contents($dataFile));
+            $data2 = json_decode($content, true, \JSON_THROW_ON_ERROR);
+            $tmpVersion = $data2['version'] ?? null;
+            $this->assertEquals($version, $tmpVersion); // 版本无变化
+        }
+        finally
+        {
+            $this->initSql();
+            // 生成模型
+            passthru($generateCommandNoMigration, $resultCode);
+            shell_exec('rm -rf ' . $modelPath);
+            shell_exec('mv -f ' . \dirname(__DIR__) . '/Model ' . $modelPath);
+        }
     }
 
     private function initSql(): void
