@@ -190,7 +190,7 @@ class MigrationTest extends TestCase
 
             $content = shell_exec('cat ' . $versionPath . '/up/*_tb_diff1_2.create.sql');
             $this->assertStringMatchesFormat(<<<SQL
-            CREATE TABLE `tb_diff1_2` (   `modify` text %ACOLLATE utf8mb4_unicode_ci NOT NULL,   `id` int%A unsigned NOT NULL AUTO_INCREMENT,   `index1` varchar(255) %ACOLLATE utf8mb4_unicode_ci DEFAULT NULL,   `index2` varchar(255) %wCOLLATE utf8mb4_unicode_ci DEFAULT NULL,   `add` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   PRIMARY KEY (`id`) USING BTREE,   KEY `index_modify` (`index1`,`index2`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='test diff';
+            CREATE TABLE `tb_diff1_2` (   `modify` text %ACOLLATE utf8mb4_unicode_ci NOT NULL,   `id` int%A unsigned NOT NULL AUTO_INCREMENT,   `index1` varchar(255) %ACOLLATE utf8mb4_unicode_ci DEFAULT NULL,   `index2` varchar(255) %ACOLLATE utf8mb4_unicode_ci DEFAULT NULL,   `add` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   PRIMARY KEY (`id`) USING BTREE,   KEY `index_modify` (`index1`,`index2`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='test diff';
             SQL, $content);
 
             $content = shell_exec('cat ' . $versionPath . '/up/*_v1.create.sql');
