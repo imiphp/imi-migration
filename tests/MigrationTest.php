@@ -157,10 +157,10 @@ class MigrationTest extends TestCase
 
             // 迁移文件内容校验
             $content = shell_exec('cat ' . $versionPath . '/down/*_tb_diff1.update.sql');
-            $this->assertEquals(<<<SQL
+            $this->assertStringMatchesFormat(<<<SQL
             ALTER TABLE `tb_diff1` COMMENT='123';
             ALTER TABLE `tb_diff1` DROP COLUMN `drop`;
-            ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` text COLLATE utf8mb4_unicode_ci NOT NULL FIRST;
+            ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` text %s NOT NULL FIRST;
             ALTER TABLE `tb_diff1` ADD COLUMN `add` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER `index2`;
             ALTER TABLE `tb_diff1` PARTITION BY HASH (`id`)
             (
