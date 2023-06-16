@@ -30,12 +30,7 @@ class BeforeGenerateModelsListener implements IEventListener
     {
         if ($this->migrationService->isOnGenerateModel())
         {
-            var_dump('begin');
             $this->migrationService->beginModelMigration();
-        }
-        else
-        {
-            var_dump('not begin');
         }
     }
 }

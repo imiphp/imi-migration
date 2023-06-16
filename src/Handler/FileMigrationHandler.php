@@ -103,23 +103,17 @@ class FileMigrationHandler implements IMigrationHandler
         if (version_compare($currentVersion, $version, '>='))
         {
             throw new \InvalidArgumentException(sprintf('Current version "%s" is greater than or equal to the target version "%s"', $currentVersion, $version));
-
-            return;
         }
         sort($versionList);
         $currentIndex = array_search($currentVersion, $versionList);
         if (false === $currentIndex)
         {
             throw new \InvalidArgumentException(sprintf('Current version "%s" does not exist', $currentVersion));
-
-            return;
         }
         $targetIndex = array_search($version, $versionList);
         if (false === $targetIndex)
         {
             throw new \InvalidArgumentException(sprintf('Target version "%s" does not exist', $version));
-
-            return;
         }
         try
         {
@@ -153,22 +147,16 @@ class FileMigrationHandler implements IMigrationHandler
         if (version_compare($currentVersion, $version, '<='))
         {
             throw new \InvalidArgumentException(sprintf('Current version "%s" is less than or equal to the target version "%s"', $currentVersion, $version));
-
-            return;
         }
         $currentIndex = array_search($currentVersion, $versionList);
         if (false === $currentIndex)
         {
             throw new \InvalidArgumentException(sprintf('Current version "%s" does not exist', $currentVersion));
-
-            return;
         }
         $targetIndex = array_search($version, $versionList);
         if (false === $targetIndex)
         {
             throw new \InvalidArgumentException(sprintf('Target version "%s" does not exist', $version));
-
-            return;
         }
         try
         {

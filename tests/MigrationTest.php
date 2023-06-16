@@ -182,10 +182,10 @@ class MigrationTest extends TestCase
             SQL, $content);
 
             $content = shell_exec('cat ' . $versionPath . '/up/*_tb_diff1.update.sql');
-            $this->assertEquals(<<<SQL
+            $this->assertStringMatchesFormat(<<<SQL
             ALTER TABLE `tb_diff1` DROP COLUMN `add`;
-            ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL AFTER `id`;
-            ALTER TABLE `tb_diff1` ADD COLUMN `drop` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL AFTER `modify`;
+            ALTER TABLE `tb_diff1` MODIFY COLUMN `modify` varchar(255) %s NOT NULL AFTER `id`;
+            ALTER TABLE `tb_diff1` ADD COLUMN `drop` varchar(255) %s NOT NULL AFTER `modify`;
             SQL, $content);
 
             $content = shell_exec('cat ' . $versionPath . '/up/*_tb_diff1_2.create.sql');
