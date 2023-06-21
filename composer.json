@@ -11,7 +11,7 @@
         "phpstan/phpstan": "~1.8.0",
         "phpunit/phpunit": "~9.6",
         "rector/rector": "^0.12.10",
-        "imiphp/imi": "generate-model-event-dev",
+        "imiphp/imi": "2.1.x-dev",
         "swoole/ide-helper": "^4.8"
     },
     "autoload": {
