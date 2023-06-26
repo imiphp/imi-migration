@@ -18,6 +18,8 @@ class FileMigrationHandler implements IMigrationHandler
 
     private ?array $data = null;
 
+    private ?string $version = null;
+
     public function __init(): void
     {
         $this->data = $this->loadData();
@@ -50,12 +52,13 @@ class FileMigrationHandler implements IMigrationHandler
 
     public function getCurrentVersion(): string
     {
-        return $this->data['version'] ??= '';
+        return $this->version ??= (file_get_contents($this->getVersionFile()) ?: '0');
     }
 
     public function setCurrentVersion(string $version): self
     {
-        $this->data['version'] = $version;
+        $this->version = $version;
+        File::putContents($this->getVersionFile(), $version);
 
         return $this;
     }
@@ -221,5 +224,10 @@ class FileMigrationHandler implements IMigrationHandler
         {
             return [];
         }
+    }
+
+    protected function getVersionFile(): string
+    {
+        return $this->path('version');
     }
 }

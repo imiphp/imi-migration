@@ -138,6 +138,7 @@ class MigrationTest extends TestCase
         $generateCommand = \dirname(__DIR__) . '/example/bin/imi-cli generate/model "app\Model" --app-namespace "app" --prefix=tb_ --override=base --lengthCheck --sqlSingleLine';
         $generateCommandNoMigration = $generateCommand . ' --no-migration';
         $dataFile = \dirname(__DIR__) . '/example/.migration/data.json';
+        $versionFile = \dirname(__DIR__) . '/example/.migration/version';
 
         $modelPath = \dirname(__DIR__) . '/example/Model';
         shell_exec('rm -rf ' . \dirname(__DIR__) . '/Model');
@@ -150,9 +151,8 @@ class MigrationTest extends TestCase
             $this->assertEquals(0, $resultCode);
             $this->assertTrue(is_file($dataFile));
             $this->assertNotEquals('[]', $content = file_get_contents($dataFile));
-            $data = json_decode($content, true, \JSON_THROW_ON_ERROR);
-            $version = $data['version'] ?? null;
-            $this->assertIsString($version);
+            $this->assertTrue(is_file($versionFile));
+            $this->assertIsString($version = file_get_contents($versionFile));
             $versionPath = $path . '/' . $version;
 
             // 迁移文件内容校验
@@ -209,8 +209,8 @@ class MigrationTest extends TestCase
             $this->assertEquals(0, $resultCode);
             $this->assertTrue(is_file($dataFile));
             $this->assertNotEquals('[]', $content = file_get_contents($dataFile));
-            $data2 = json_decode($content, true, \JSON_THROW_ON_ERROR);
-            $tmpVersion = $data2['version'] ?? null;
+            $this->assertTrue(is_file($versionFile));
+            $this->assertIsString($tmpVersion = file_get_contents($versionFile));
             $this->assertEquals($version, $tmpVersion); // 版本无变化
 
             // 回滚成功
@@ -223,8 +223,8 @@ class MigrationTest extends TestCase
             $this->assertEquals(0, $resultCode);
             $this->assertTrue(is_file($dataFile));
             $this->assertNotEquals('[]', $content = file_get_contents($dataFile));
-            $data2 = json_decode($content, true, \JSON_THROW_ON_ERROR);
-            $tmpVersion = $data2['version'] ?? null;
+            $this->assertTrue(is_file($versionFile));
+            $this->assertIsString($tmpVersion = file_get_contents($versionFile));
             $this->assertEquals('0', $tmpVersion);
 
             // 迁移
@@ -235,8 +235,8 @@ class MigrationTest extends TestCase
             $this->assertEquals(0, $resultCode);
             $this->assertTrue(is_file($dataFile));
             $this->assertNotEquals('[]', $content = file_get_contents($dataFile));
-            $data2 = json_decode($content, true, \JSON_THROW_ON_ERROR);
-            $tmpVersion = $data2['version'] ?? null;
+            $this->assertTrue(is_file($versionFile));
+            $this->assertIsString($tmpVersion = file_get_contents($versionFile));
             $this->assertEquals($version, $tmpVersion); // 版本无变化
         }
         finally
