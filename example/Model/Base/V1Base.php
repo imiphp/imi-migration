@@ -16,7 +16,7 @@ use Imi\Model\Model as Model;
  *
  * @Entity(camel=true, bean=true, incrUpdate=false)
  * @Table(name=@ConfigValue(name="@app.models.app\Model\V1.name", default="v1"), usePrefix=false, id={"a"}, dbPoolName=@ConfigValue(name="@app.models.app\Model\V1.poolName"))
- * @DDL(sql="CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1` AS select 1 AS `a`,2 AS `b`", decode="")
+ * @DDL(sql="CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1` AS select 1 AS `a`,2 AS `b`")
  *
  * @property int|null $a
  * @property int|null $b
