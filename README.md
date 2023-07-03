@@ -17,7 +17,9 @@
 
 ## 使用说明
 
-### 同步表结构
+### 模型同步到表结构
+
+#### 同步表结构
 
 将数据库中的数据表结构升级为模型中定义的结构。
 
@@ -25,7 +27,7 @@
 vendor/bin/imi-swoole migration/patch -f
 ```
 
-### 生成同步结构 SQL 语句
+#### 生成同步结构 SQL 语句
 
 **输出到命令行：**
 
@@ -38,6 +40,59 @@ vendor/bin/imi-swoole migration/patch
 ```shell
 vendor/bin/imi-swoole migration/patch -f "文件名"
 ```
+
+### 数据库迁移
+
+#### 配置
+
+`@app.beans`:
+
+```php
+[
+    \Imi\Migration\Service\MigrationService::class => [
+        'handler' => \Imi\Migration\Handler\FileMigrationHandler::class, // 迁移处理器
+        'onGenerateModel' => true, // 是否在生成模型时自动生成迁移文件
+    ],
+]
+```
+
+> 上述配置是默认配置，不配置时自动启用。
+
+#### 目录
+
+`.migration` 是存放数据库迁移文件和版本信息的目录，请勿将 `.migration/version` 提交到版本控制系统。
+
+#### 执行数据库迁移
+
+**执行前询问：**
+
+```shell
+vendor/bin/imi-swoole migration/migrate
+```
+
+**强制执行：**
+
+```shell
+vendor/bin/imi-swoole migration/migrate -f
+```
+
+> 请谨慎操作
+
+### 执行数据库回滚
+
+**执行前询问：**
+
+```shell
+vendor/bin/imi-swoole migration/rollback
+```
+
+**强制执行：**
+
+```shell
+vendor/bin/imi-swoole migration/rollback -f
+```
+
+> 请谨慎操作
 
 ### 通用参数
 
